@@ -1,6 +1,6 @@
 package im.years.recyclerviewwrapper;
 
-import android.support.annotation.ColorRes;
+import androidx.annotation.ColorRes;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;

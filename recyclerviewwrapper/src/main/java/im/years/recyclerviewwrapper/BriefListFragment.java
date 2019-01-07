@@ -4,7 +4,7 @@ package im.years.recyclerviewwrapper;
  * Created by alvinzeng on 19/10/2016.
  */
 
-import android.support.annotation.ColorRes;
+import androidx.annotation.ColorRes;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
