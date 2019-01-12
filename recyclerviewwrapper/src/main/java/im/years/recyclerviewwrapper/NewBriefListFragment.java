@@ -12,7 +12,7 @@ public abstract class NewBriefListFragment<T, K extends BaseViewHolder> extends 
     @LayoutRes
     protected abstract int getItemViewRes();
 
-    public abstract void onBindViewItemHolder(BaseViewHolder holder, T item);
+    public abstract void onBindViewItemHolder(K holder, T item);
 
     @Override
     protected void initViews() {

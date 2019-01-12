@@ -25,7 +25,7 @@ public abstract class NewListFragment extends Fragment {
     private BaseQuickAdapter mQuickAdapter;
 
     private View emptyView;
-    private int currentPage = 0;
+    private int currentPage = 1;
     private boolean isEnabledLoadMore;
     private boolean isEnabledRefresh;
 
@@ -66,9 +66,8 @@ public abstract class NewListFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (mQuickAdapter != null && isEnabledLoadMore) {
-                    mQuickAdapter.loadMoreComplete();
-                }
+                // 刷新先禁用加载
+                mQuickAdapter.setEnableLoadMore(false);
                 NewListFragment.this.onRefresh();
             }
         });
@@ -79,7 +78,8 @@ public abstract class NewListFragment extends Fragment {
         // init adapter config
         mQuickAdapter = adapter;
         mQuickAdapter.isFirstOnly(true);
-        mQuickAdapter.setNotDoAnimationCount(getPageSize());
+        mQuickAdapter.setNotDoAnimationCount(getPageSize()); // 第一页无动画
+        mQuickAdapter.setPreLoadNumber(getPreLoadNumber()); // 倒数第几个开始加载
         mRecyclerView.setAdapter(mQuickAdapter);
         mQuickAdapter.setPreLoadNumber(getPreLoadNumber());
 
@@ -121,7 +121,7 @@ public abstract class NewListFragment extends Fragment {
         }
 
         isEnabledRefresh = true;
-        mSwipeRefreshLayout.setEnabled(isEnabledRefresh);
+        mSwipeRefreshLayout.setEnabled(true);
     }
 
     protected void disableRefresh() {
@@ -149,7 +149,6 @@ public abstract class NewListFragment extends Fragment {
         }
 
         mQuickAdapter.setEnableLoadMore(true);
-        mQuickAdapter.setPreLoadNumber(getPageSize());
         mQuickAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
@@ -171,31 +170,11 @@ public abstract class NewListFragment extends Fragment {
         mQuickAdapter.notifyItemChanged(mRecyclerView.getChildCount());
     }
 
-    protected void refresh(@Nullable final List newData) {
-        if (mQuickAdapter == null) {
-            throw new RuntimeException("Please call setAdapter first.");
-        }
-
-        if (getActivity() == null || newData == null) {
-            return;
-        }
-
-        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-            mQuickAdapter.setNewData(newData);
-        } else {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mQuickAdapter.setNewData(newData);
-                }
-            });
-        }
-    }
-
     protected void endLoading(final boolean success, final boolean isMore, @NonNull final List newData) {
         if (getActivity() == null) {
             return;
         }
+
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
             endLoadingOnUiThread(success, isMore, newData);
         } else {
@@ -208,13 +187,13 @@ public abstract class NewListFragment extends Fragment {
         }
     }
 
-    private void endLoadingOnUiThread(boolean success, boolean isMore, @NonNull List newData) {
+    protected void endLoadingOnUiThread(boolean success, boolean isMore, @NonNull List newData) {
         if (success) {
             int newDataSize = newData.size();
 
             if (isMore) { // load more
                 currentPage++;
-                if (newDataSize == 0) {
+                if (newDataSize < getPageSize()) {
                     mQuickAdapter.loadMoreEnd();
                 } else {
                     mQuickAdapter.loadMoreComplete();
@@ -222,21 +201,12 @@ public abstract class NewListFragment extends Fragment {
 
                 mQuickAdapter.addData(newData);
             } else { //refresh
-                currentPage = 0;
+                currentPage = 1;
 
-                if (newDataSize == 0 && emptyView != null) {
-                    if (emptyView.getParent() != null) {
-                        ((ViewGroup) emptyView.getParent()).removeView(emptyView);
-                    }
-                    mQuickAdapter.setEmptyView(emptyView);
-                    mQuickAdapter.setHeaderFooterEmpty(true, false);
-                }
-
-                if (isEnabledLoadMore && newDataSize >= getPageSize()) {
-                    realEnableLoadMore();
-                } else {
+                if (newDataSize < getPageSize()) {
                     realDisableLoadMore();
                 }
+
                 mQuickAdapter.setNewData(newData);
             }
         } else {
@@ -246,12 +216,17 @@ public abstract class NewListFragment extends Fragment {
         }
 
         if (mSwipeRefreshLayout != null) {
+            mSwipeRefreshLayout.setEnabled(this.isEnabledRefresh);// 恢复刷新（加载，刷新不能同时进行）
             mSwipeRefreshLayout.setRefreshing(false);
         }
+
+        mQuickAdapter.setEnableLoadMore(this.isEnabledLoadMore); // 刷新后恢复加载（加载，刷新不能同时进行）
     }
 
     public void setEmptyView(View emptyView) {
         this.emptyView = emptyView;
+        mQuickAdapter.setEmptyView(emptyView);
+        mQuickAdapter.setHeaderFooterEmpty(true, false);
     }
 
     public void addHeaderView(View header) {
@@ -278,6 +253,7 @@ public abstract class NewListFragment extends Fragment {
     }
 
     protected void onRefresh() {
+        this.mSwipeRefreshLayout.setRefreshing(true);
     }
 
     protected void onItemClick(View clickedView, int position) {
