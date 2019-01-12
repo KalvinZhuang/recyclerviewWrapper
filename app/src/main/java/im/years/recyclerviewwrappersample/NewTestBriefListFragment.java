@@ -37,6 +37,7 @@ public class NewTestBriefListFragment extends NewBriefListFragment<ContentMock, 
         setEmptyView(new ListEmptyView(getContext()));
         setListDivider(R.color.list_divider);
         onRefresh();
+        setLoadEndGone(true);
     }
 
     @Override

@@ -30,6 +30,7 @@ public abstract class NewListFragment extends Fragment {
     private int currentPage = 1;
     private boolean isEnabledLoadMore;
     private boolean isEnabledRefresh;
+    private boolean isLoadEndGone;
 
     @Nullable
     @Override
@@ -123,6 +124,10 @@ public abstract class NewListFragment extends Fragment {
         });
     }
 
+    public void setLoadEndGone(boolean isGon) { // 不显示 加载完成（没有更多数据）
+        isLoadEndGone = isGon;
+    }
+
     protected void enableRefresh() {
         if (mSwipeRefreshLayout == null) {
             throw new RuntimeException("Did you add SwipeRefreshLayout in your layout?");
@@ -207,7 +212,7 @@ public abstract class NewListFragment extends Fragment {
             }
 
             if (newDataSize < getPageSize()) {
-                mQuickAdapter.loadMoreEnd(!isMore);
+                mQuickAdapter.loadMoreEnd(!isMore || isLoadEndGone);
             } else {
                 mQuickAdapter.loadMoreComplete();
             }
