@@ -41,11 +41,11 @@ public abstract class NewListFragment extends Fragment {
         mRecyclerView = rootView.findViewById(R.id.recyclerView);
         mSwipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
 
-        // init pages
-        this.initViews();
         this.initSwipeRefreshLayout(mSwipeRefreshLayout);
         this.initRecycleView(mRecyclerView);
 
+        // init pages
+        this.initViews();
         return rootView;
     }
 
