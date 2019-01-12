@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.BaseViewHolder;
 
 import java.util.List;
 
@@ -20,11 +21,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import im.years.recyclerviewwrapper.decoration.HorizontalDividerItemDecoration;
 
-public abstract class NewListFragment extends Fragment {
+public abstract class NewListFragment<T, K extends BaseViewHolder> extends Fragment {
 
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private BaseQuickAdapter mQuickAdapter;
+    private BaseQuickAdapter<T, K> mQuickAdapter;
 
     private View emptyView;
     private int currentPage = 1;
@@ -122,6 +123,14 @@ public abstract class NewListFragment extends Fragment {
                 return true;
             }
         });
+    }
+
+    protected List<T> getItems() {
+        return (List<T>) mQuickAdapter.getData();
+    }
+
+    protected T getItem(int position) {
+        return mQuickAdapter.getItem(position);
     }
 
     public void setLoadEndGone(boolean isGon) { // 不显示 加载完成（没有更多数据）

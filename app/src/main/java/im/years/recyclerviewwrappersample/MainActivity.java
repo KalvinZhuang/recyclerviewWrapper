@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
                 case 3:
                     fragment = new NewTestBriefListFragment();
                     break;
+                case 4:
+                    fragment = new NewTestBriefListFragment();
+                    break;
             }
 
             return fragment;
@@ -70,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
                 case 3:
                     title = "new_brief";
                     break;
+                case 4:
+                    title = "data bind demo";
+                    break;
             }
 
             return title;
@@ -77,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 4;
+            return 5;
         }
     }
 }

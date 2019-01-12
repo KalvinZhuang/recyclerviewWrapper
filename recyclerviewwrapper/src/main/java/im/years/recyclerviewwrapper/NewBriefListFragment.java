@@ -3,16 +3,16 @@ package im.years.recyclerviewwrapper;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.LayoutRes;
 
-public abstract class NewBriefListFragment<T, K extends BaseViewHolder> extends NewListFragment {
+public abstract class NewBriefListFragment<T> extends NewListFragment {
 
     @LayoutRes
     protected abstract int getItemViewRes();
 
-    public abstract void onBindViewItemHolder(K holder, T item);
+    public abstract void onBindViewItemHolder(BaseViewHolder holder, T item);
 
     @Override
     protected void initViews() {
@@ -22,8 +22,8 @@ public abstract class NewBriefListFragment<T, K extends BaseViewHolder> extends 
         setAdapter(sampleListAdapter = new SampleListAdapter());
     }
 
-    protected ArrayList<T> getItems() {
-        return (ArrayList<T>) sampleListAdapter.getData();
+    protected List<T> getItems() {
+        return (List<T>) sampleListAdapter.getData();
     }
 
     protected T getItem(int position) {
@@ -40,13 +40,13 @@ public abstract class NewBriefListFragment<T, K extends BaseViewHolder> extends 
         return sampleListAdapter;
     }
 
-    protected class SampleListAdapter extends BaseQuickAdapter<T, K> {
+    protected class SampleListAdapter extends BaseQuickAdapter<T, BaseViewHolder> {
         protected SampleListAdapter() {
             super(NewBriefListFragment.this.getItemViewRes(), null);
         }
 
         @Override
-        protected void convert(K baseViewHolder, T item) {
+        protected void convert(BaseViewHolder baseViewHolder, T item) {
             onBindViewItemHolder(baseViewHolder, item);
         }
     }

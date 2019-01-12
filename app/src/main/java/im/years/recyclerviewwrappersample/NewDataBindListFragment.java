@@ -4,34 +4,27 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 
-import com.chad.library.adapter.base.BaseViewHolder;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import im.years.recyclerviewwrapper.NewBriefListFragment;
+import im.years.recyclerviewwrapper.NewListFragment;
 import im.years.recyclerviewwrapper.view.ListEmptyView;
+import im.years.recyclerviewwrappersample.databinding.ItemHelloListBinding;
+import im.years.recyclerviewwrappersample.viewHolder.DataBindBaseViewHolder;
 
-public class NewTestBriefListFragment extends NewBriefListFragment<ContentMock> {
+public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBindBaseViewHolder<ItemHelloListBinding>> {
     // 模拟要请求的页面
     private int testRequestPage = 1;
     private int refreshTimes = 1;
-
-    @Override
-    protected int getItemViewRes() {
-        return R.layout.item_hello_list;
-    }
-
-    @Override
-    public void onBindViewItemHolder(BaseViewHolder holder, ContentMock item) {
-        holder.addOnClickListener(R.id.button);
-        holder.setText(R.id.textView, item.title);
-    }
-
+    private SampleListAdapter sampleListAdapter = new SampleListAdapter();
 
     @Override
     protected void initViews() {
         super.initViews();
+
+        this.setAdapter(sampleListAdapter);
 
         // 开启加载
         enableRefresh();
@@ -90,7 +83,7 @@ public class NewTestBriefListFragment extends NewBriefListFragment<ContentMock> 
 
     private List<ContentMock> mockDate(int size) {
         List<ContentMock> contentMockList = new ArrayList<>();
-        int totalSize = this.getItems().size();
+        int totalSize = sampleListAdapter.getItemCount();
         for (int i = 0; i < size; i++) {
             int index = totalSize + i;
             ContentMock contentMock = new ContentMock("title: index:" + index, "content:" + index);
@@ -126,5 +119,17 @@ public class NewTestBriefListFragment extends NewBriefListFragment<ContentMock> 
     @Override
     protected int getPageSize() {
         return 5;
+    }
+
+    class SampleListAdapter extends BaseQuickAdapter<ContentMock, DataBindBaseViewHolder<ItemHelloListBinding>> {
+        SampleListAdapter() {
+            super(R.layout.item_hello_list, null);
+        }
+
+        @Override
+        protected void convert(DataBindBaseViewHolder<ItemHelloListBinding> helper, ContentMock item) {
+            ItemHelloListBinding dataBinding = helper.getDataBinding();
+            dataBinding.setItemData(item);
+        }
     }
 }
