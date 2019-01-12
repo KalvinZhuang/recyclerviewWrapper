@@ -33,11 +33,4 @@ public abstract class ListFragment extends NewListFragment {
             });
         }
     }
-
-    protected void setListDivider(@ColorRes int color) {
-        getRecyclerView().addItemDecoration(
-                new HorizontalDividerItemDecoration.Builder(getActivity())
-                        .colorResId(color)
-                        .build());
-    }
 }

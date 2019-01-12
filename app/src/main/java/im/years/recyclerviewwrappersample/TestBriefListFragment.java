@@ -12,10 +12,6 @@ import java.util.ArrayList;
 import im.years.recyclerviewwrapper.BriefListFragment;
 import im.years.recyclerviewwrapper.view.ListEmptyView;
 
-/**
- * Created by alvinzeng on 24/10/2016.
- */
-
 public class TestBriefListFragment extends BriefListFragment<ContentMock> {
     @Override
     protected int itemViewRes() {
@@ -35,9 +31,6 @@ public class TestBriefListFragment extends BriefListFragment<ContentMock> {
         enableLoadMore();
 
         setEmptyView(new ListEmptyView(getContext()));
-
-        //addHeaderView(LayoutInflater.from(getContext()).inflate(R.layout.view_footer, null));
-        //addFooterView(LayoutInflater.from(getContext()).inflate(R.layout.view_footer, null));
 
         setListDivider(R.color.list_divider);
 

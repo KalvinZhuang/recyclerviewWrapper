@@ -1,12 +1,14 @@
 package im.years.recyclerviewwrappersample;
 
+import android.os.Bundle;
+
 import com.google.android.material.tabs.TabLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new TestBriefListFragment();
                     break;
                 case 2:
-                    fragment = new TestFragment();
+                    fragment = new TestBriefListFragment();
+                    break;
+                case 3:
+                    fragment = new NewTestBriefListFragment();
                     break;
             }
 
@@ -62,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
                 case 2:
                     title = "Easy";
                     break;
+                case 3:
+                    title = "new_brief";
+                    break;
             }
 
             return title;
@@ -69,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
     }
 }

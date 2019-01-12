@@ -10,6 +10,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import java.util.List;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import im.years.recyclerviewwrapper.decoration.HorizontalDividerItemDecoration;
 
 public abstract class NewListFragment extends Fragment {
 
@@ -73,6 +75,13 @@ public abstract class NewListFragment extends Fragment {
         });
     }
 
+    protected void setListDivider(@ColorRes int color) {
+        mRecyclerView.addItemDecoration(
+                new HorizontalDividerItemDecoration.Builder(getActivity())
+                        .colorResId(color)
+                        .build());
+    }
+
     protected void setAdapter(BaseQuickAdapter adapter) {
 
         // init adapter config
@@ -81,7 +90,6 @@ public abstract class NewListFragment extends Fragment {
         mQuickAdapter.setNotDoAnimationCount(getPageSize()); // 第一页无动画
         mQuickAdapter.setPreLoadNumber(getPreLoadNumber()); // 倒数第几个开始加载
         mRecyclerView.setAdapter(mQuickAdapter);
-        mQuickAdapter.setPreLoadNumber(getPreLoadNumber());
 
         // bind Event
         mQuickAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
@@ -193,34 +201,26 @@ public abstract class NewListFragment extends Fragment {
 
             if (isMore) { // load more
                 currentPage++;
-                if (newDataSize < getPageSize()) {
-                    mQuickAdapter.loadMoreEnd();
-                } else {
-                    mQuickAdapter.loadMoreComplete();
-                }
-
                 mQuickAdapter.addData(newData);
             } else { //refresh
-                currentPage = 1;
-
-                if (newDataSize < getPageSize()) {
-                    realDisableLoadMore();
-                }
-
                 mQuickAdapter.setNewData(newData);
             }
-        } else {
-            if (isMore) {
-                mQuickAdapter.loadMoreFail();
+
+            if (newDataSize < getPageSize()) {
+                mQuickAdapter.loadMoreEnd(!isMore);
+            } else {
+                mQuickAdapter.loadMoreComplete();
             }
+        } else {
+            mQuickAdapter.loadMoreFail();
         }
+
+        mQuickAdapter.setEnableLoadMore(this.isEnabledLoadMore); // 恢复加载
 
         if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setEnabled(this.isEnabledRefresh);// 恢复刷新（加载，刷新不能同时进行）
             mSwipeRefreshLayout.setRefreshing(false);
         }
-
-        mQuickAdapter.setEnableLoadMore(this.isEnabledLoadMore); // 刷新后恢复加载（加载，刷新不能同时进行）
     }
 
     public void setEmptyView(View emptyView) {
