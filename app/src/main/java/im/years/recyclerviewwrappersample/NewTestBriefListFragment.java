@@ -127,4 +127,9 @@ public class NewTestBriefListFragment extends NewBriefListFragment<ContentMock> 
     protected int getPageSize() {
         return 5;
     }
+
+    @Override
+    protected int getPreLoadNumber() {
+        return 2;
+    }
 }

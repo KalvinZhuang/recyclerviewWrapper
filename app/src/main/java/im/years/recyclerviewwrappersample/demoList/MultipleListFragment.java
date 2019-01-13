@@ -1,30 +1,35 @@
-package im.years.recyclerviewwrappersample;
+package im.years.recyclerviewwrappersample.demoList;
 
 import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.databinding.ViewDataBinding;
 import im.years.recyclerviewwrapper.NewListFragment;
 import im.years.recyclerviewwrapper.view.ListEmptyView;
+import im.years.recyclerviewwrappersample.R;
 import im.years.recyclerviewwrappersample.databinding.ItemHelloListBinding;
+import im.years.recyclerviewwrappersample.databinding.ItemListLefBinding;
+import im.years.recyclerviewwrappersample.databinding.ItemListRightBinding;
+import im.years.recyclerviewwrappersample.model.MultipleContentMock;
 import im.years.recyclerviewwrappersample.viewHolder.DataBindBaseViewHolder;
 
-public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBindBaseViewHolder<ItemHelloListBinding>> {
+public class MultipleListFragment extends NewListFragment<MultipleContentMock, DataBindBaseViewHolder<ItemHelloListBinding>> {
     // 模拟要请求的页面
     private int testRequestPage = 1;
     private int refreshTimes = 1;
-    private SampleListAdapter sampleListAdapter = new SampleListAdapter();
+    private SampleListAdapter sampleListAdapter = new SampleListAdapter(null);
 
     @Override
     protected void initViews() {
         super.initViews();
 
-        this.setAdapter(sampleListAdapter);
+//        this.setAdapter(sampleListAdapter);
 
         // 开启加载
         enableRefresh();
@@ -55,7 +60,7 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
             @Override
             public void run() {
                 boolean success = true;
-                List<ContentMock> contentMockList = new ArrayList<>();
+                List<MultipleContentMock> contentMockList = new ArrayList<>();
                 if (refresh) {// 刷新
                     if (refreshTimes % 3 == 0) {
                         contentMockList = mockDate(getPageSize() - 1);
@@ -81,12 +86,19 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
         }, 1500);
     }
 
-    private List<ContentMock> mockDate(int size) {
-        List<ContentMock> contentMockList = new ArrayList<>();
+    private List<MultipleContentMock> mockDate(int size) {
+        List<MultipleContentMock> contentMockList = new ArrayList<>();
         int totalSize = sampleListAdapter.getItemCount();
         for (int i = 0; i < size; i++) {
             int index = totalSize + i;
-            ContentMock contentMock = new ContentMock("title: index:" + index, "content:" + index);
+            MultipleContentMock contentMock;
+            if (i > 1 && i % 3 == 0) {
+                contentMock = new MultipleContentMock(MultipleContentMock.left_type);
+
+            } else {
+                contentMock = new MultipleContentMock(MultipleContentMock.left_type);
+            }
+            contentMock.setTitle("" + index);
             contentMockList.add(contentMock);
         }
         return contentMockList;
@@ -96,24 +108,24 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
     @Override
     protected void onItemChildClick(View clickedItemView, int position) {
         super.onItemChildClick(clickedItemView, position);
-        Toast.makeText(getContext(), "Click Title: " + getItem(position).title, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Click Title: " + getItem(position).getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onItemClick(View clickedView, int position) {
         super.onItemClick(clickedView, position);
-        Toast.makeText(getContext(), getItem(position).title, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getItem(position).getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onItemLongClick(View clickedView, int position) {
-        Toast.makeText(getContext(), "Long Click: " + getItem(position).title, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Long Click: " + getItem(position).getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onItemChildLongClick(View clickedItemView, int position) {
         super.onItemChildLongClick(clickedItemView, position);
-        Toast.makeText(getContext(), "Long Click Title: " + getItem(position).title, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Long Click Title: " + getItem(position).getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -126,15 +138,28 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
         return 2;
     }
 
-    class SampleListAdapter extends BaseQuickAdapter<ContentMock, DataBindBaseViewHolder<ItemHelloListBinding>> {
-        SampleListAdapter() {
-            super(R.layout.item_hello_list, null);
+    private class SampleListAdapter extends BaseMultiItemQuickAdapter<MultipleContentMock, DataBindBaseViewHolder> {
+
+        SampleListAdapter(List<MultipleContentMock> data) {
+            super(data);
+            addItemType(MultipleContentMock.left_type, R.layout.item_list_lef);
+            addItemType(MultipleContentMock.right_type, R.layout.item_list_right);
         }
 
         @Override
-        protected void convert(DataBindBaseViewHolder<ItemHelloListBinding> helper, ContentMock item) {
-            ItemHelloListBinding dataBinding = helper.getDataBinding();
-            dataBinding.setItemData(item);
+        protected void convert(DataBindBaseViewHolder helper, MultipleContentMock item) {
+            switch (item.getType()) {
+                case MultipleContentMock.left_type: {
+                    ItemListLefBinding dataBinding = (ItemListLefBinding) helper.getDataBinding();
+                    dataBinding.setItemData(item);
+                }
+                    break;
+                case MultipleContentMock.right_type: {
+                    ItemListRightBinding dataBinding = (ItemListRightBinding) helper.getDataBinding();
+                    dataBinding.setItemData(item);
+                }
+                    break;
+            }
         }
     }
 }

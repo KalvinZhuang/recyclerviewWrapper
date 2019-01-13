@@ -2,6 +2,7 @@ package im.years.recyclerviewwrappersample;
 
 import android.os.Bundle;
 
+
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import im.years.recyclerviewwrappersample.demoList.MultipleListFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,8 +52,11 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new NewTestBriefListFragment();
                     break;
                 case 4:
-                    fragment = new NewTestBriefListFragment();
+                    fragment = new NewDataBindListFragment();
                     break;
+//                case 5:
+//                    fragment = new MultipleListFragment();
+//                    break;
             }
 
             return fragment;
@@ -76,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
                 case 4:
                     title = "data bind demo";
                     break;
+//                case 5:
+//                    title = "多布局 demo";
+//                    break;
             }
 
             return title;
