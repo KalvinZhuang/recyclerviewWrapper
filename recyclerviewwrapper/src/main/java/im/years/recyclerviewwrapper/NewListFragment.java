@@ -28,7 +28,7 @@ public abstract class NewListFragment<T, K extends BaseViewHolder> extends Fragm
     private BaseQuickAdapter<T, K> mQuickAdapter;
 
     private View emptyView;
-    private int currentPage = 1;
+    protected int currentPage = 0;
     private boolean isEnabledLoadMore;
     private boolean isEnabledRefresh;
     private boolean isLoadEndGone;
@@ -214,7 +214,6 @@ public abstract class NewListFragment<T, K extends BaseViewHolder> extends Fragm
             int newDataSize = newData.size();
 
             if (isMore) { // load more
-                currentPage++;
                 mQuickAdapter.addData(newData);
             } else { //refresh
                 mQuickAdapter.setNewData(newData);
@@ -229,6 +228,7 @@ public abstract class NewListFragment<T, K extends BaseViewHolder> extends Fragm
             mQuickAdapter.loadMoreFail();
         }
 
+        currentPage = isMore ? ++currentPage : 0; // 当前是第几页（从0 开始）
         mQuickAdapter.setEnableLoadMore(this.isEnabledLoadMore); // 恢复加载
 
         if (mSwipeRefreshLayout != null) {
