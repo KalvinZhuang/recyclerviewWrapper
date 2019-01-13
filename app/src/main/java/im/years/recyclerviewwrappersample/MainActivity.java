@@ -54,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
                 case 4:
                     fragment = new NewDataBindListFragment();
                     break;
-//                case 5:
-//                    fragment = new MultipleListFragment();
-//                    break;
+                case 5:
+                    fragment = new MultipleListFragment();
+                    break;
             }
 
             return fragment;
@@ -81,9 +81,9 @@ public class MainActivity extends AppCompatActivity {
                 case 4:
                     title = "data bind demo";
                     break;
-//                case 5:
-//                    title = "多布局 demo";
-//                    break;
+                case 5:
+                    title = "多布局 demo";
+                    break;
             }
 
             return title;
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 5;
+            return 6;
         }
     }
 }

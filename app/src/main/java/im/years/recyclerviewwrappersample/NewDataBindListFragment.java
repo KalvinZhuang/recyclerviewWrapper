@@ -5,10 +5,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.BaseViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import im.years.recyclerviewwrapper.NewListFragment;
 import im.years.recyclerviewwrapper.view.ListEmptyView;
 import im.years.recyclerviewwrappersample.databinding.ItemHelloListBinding;
@@ -126,15 +129,29 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
         return 2;
     }
 
-    class SampleListAdapter extends BaseQuickAdapter<ContentMock, DataBindBaseViewHolder<ItemHelloListBinding>> {
+    class SampleListAdapter extends BaseQuickAdapter<ContentMock, SampleListAdapter.DateBindViewHolder> {
         SampleListAdapter() {
             super(R.layout.item_hello_list, null);
         }
 
         @Override
-        protected void convert(DataBindBaseViewHolder<ItemHelloListBinding> helper, ContentMock item) {
-            ItemHelloListBinding dataBinding = helper.getDataBinding();
+        protected void convert(DateBindViewHolder helper, ContentMock item) {
+            ItemHelloListBinding dataBinding = (ItemHelloListBinding) helper.getDataBinding();
             dataBinding.setItemData(item);
+        }
+
+        // 你把这个类抽出去就不能使用了（类型转换异常） | 这个类也不能拥有自己的泛型  （你可以自定义自己的 adapter ，和 view Holder）
+        public class DateBindViewHolder extends BaseViewHolder {
+            private ViewDataBinding dataBind;
+
+            public DateBindViewHolder(View view) {
+                super(view);
+                dataBind = DataBindingUtil.bind(view);
+            }
+
+            public ViewDataBinding getDataBinding() {
+                return dataBind;
+            }
         }
     }
 }

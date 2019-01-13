@@ -5,10 +5,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
+import com.chad.library.adapter.base.BaseViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import im.years.recyclerviewwrapper.NewListFragment;
 import im.years.recyclerviewwrapper.view.ListEmptyView;
@@ -29,7 +31,7 @@ public class MultipleListFragment extends NewListFragment<MultipleContentMock, D
     protected void initViews() {
         super.initViews();
 
-//        this.setAdapter(sampleListAdapter);
+        this.setAdapter(sampleListAdapter);
 
         // 开启加载
         enableRefresh();
@@ -93,8 +95,7 @@ public class MultipleListFragment extends NewListFragment<MultipleContentMock, D
             int index = totalSize + i;
             MultipleContentMock contentMock;
             if (i > 1 && i % 3 == 0) {
-                contentMock = new MultipleContentMock(MultipleContentMock.left_type);
-
+                contentMock = new MultipleContentMock(MultipleContentMock.right_type);
             } else {
                 contentMock = new MultipleContentMock(MultipleContentMock.left_type);
             }
@@ -138,7 +139,7 @@ public class MultipleListFragment extends NewListFragment<MultipleContentMock, D
         return 2;
     }
 
-    private class SampleListAdapter extends BaseMultiItemQuickAdapter<MultipleContentMock, DataBindBaseViewHolder> {
+    private class SampleListAdapter extends BaseMultiItemQuickAdapter<MultipleContentMock, SampleListAdapter.DateBindViewHolder> {
 
         SampleListAdapter(List<MultipleContentMock> data) {
             super(data);
@@ -147,18 +148,33 @@ public class MultipleListFragment extends NewListFragment<MultipleContentMock, D
         }
 
         @Override
-        protected void convert(DataBindBaseViewHolder helper, MultipleContentMock item) {
+        protected void convert(DateBindViewHolder helper, MultipleContentMock item) {
             switch (item.getType()) {
                 case MultipleContentMock.left_type: {
                     ItemListLefBinding dataBinding = (ItemListLefBinding) helper.getDataBinding();
                     dataBinding.setItemData(item);
                 }
-                    break;
+                break;
                 case MultipleContentMock.right_type: {
                     ItemListRightBinding dataBinding = (ItemListRightBinding) helper.getDataBinding();
                     dataBinding.setItemData(item);
                 }
-                    break;
+                break;
+            }
+        }
+
+
+        // view holder 需要在内部定义否则无效 (需要定义并重写 内部的 BaseViewHolder )
+        public class DateBindViewHolder extends BaseViewHolder {
+            private ViewDataBinding dataBind;
+
+            public DateBindViewHolder(View view) {
+                super(view);
+                dataBind = DataBindingUtil.bind(view);
+            }
+
+            public ViewDataBinding getDataBinding() {
+                return dataBind;
             }
         }
     }
