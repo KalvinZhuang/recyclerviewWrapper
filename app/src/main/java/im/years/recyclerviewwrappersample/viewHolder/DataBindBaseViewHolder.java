@@ -13,7 +13,7 @@ public class DataBindBaseViewHolder<T extends ViewDataBinding> extends BaseViewH
     public DataBindBaseViewHolder(View view) {
         super(view);
 
-        T bind = DataBindingUtil.bind(view);
+        dataBinding = DataBindingUtil.bind(view);
     }
 
     public T getDataBinding() {

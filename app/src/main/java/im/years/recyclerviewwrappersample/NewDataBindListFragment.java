@@ -2,6 +2,7 @@ package im.years.recyclerviewwrappersample;
 
 import android.os.Handler;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -129,7 +130,7 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
         return 2;
     }
 
-    class SampleListAdapter extends BaseQuickAdapter<ContentMock, SampleListAdapter.DateBindViewHolder> {
+    /*class SampleListAdapter extends BaseQuickAdapter<ContentMock, SampleListAdapter.DateBindViewHolder> {
         SampleListAdapter() {
             super(R.layout.item_hello_list, null);
         }
@@ -153,5 +154,33 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
                 return dataBind;
             }
         }
+    }
+*/
+
+    /*
+    * 方式二： 通过重写创建方法
+    * */
+    class SampleListAdapter extends BaseQuickAdapter<ContentMock, DataBindBaseViewHolder<ItemHelloListBinding>> {
+        SampleListAdapter() {
+            super(R.layout.item_hello_list, null);
+        }
+
+        @Override
+        protected void convert(DataBindBaseViewHolder<ItemHelloListBinding> helper, ContentMock item) {
+            ItemHelloListBinding dataBinding = helper.getDataBinding();
+            dataBinding.setItemData(item);
+        }
+
+        @Override
+        protected DataBindBaseViewHolder<ItemHelloListBinding> createBaseViewHolder(ViewGroup parent, int layoutResId) {
+            View view = getItemView(layoutResId, parent);
+            return new DataBindBaseViewHolder<ItemHelloListBinding>(view);
+        }
+
+//        // 一定要重写不然创建的不会是 对应的类型
+//        @Override
+//        protected DataBindBaseViewHolder<ItemHelloListBinding> createBaseViewHolder(View view) {
+//            return new DataBindBaseViewHolder<ItemHelloListBinding>(view);
+//        }
     }
 }
