@@ -27,7 +27,6 @@ public abstract class NewListFragment<T, K extends BaseViewHolder> extends Fragm
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private BaseQuickAdapter<T, K> mQuickAdapter;
 
-    private View emptyView;
     protected int currentPage = 0;
     private boolean isEnabledLoadMore;
     private boolean isEnabledRefresh;
@@ -92,6 +91,7 @@ public abstract class NewListFragment<T, K extends BaseViewHolder> extends Fragm
         mQuickAdapter.setNotDoAnimationCount(getPageSize()); // 第一页无动画
         mQuickAdapter.setPreLoadNumber(getPreLoadNumber()); // 倒数第几个开始加载
         mRecyclerView.setAdapter(mQuickAdapter);
+        mQuickAdapter.setHeaderFooterEmpty(true, true); //有 head 或 foot 也可以显示 emptyView
 
         // bind Event
         mQuickAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
@@ -210,6 +210,8 @@ public abstract class NewListFragment<T, K extends BaseViewHolder> extends Fragm
     }
 
     protected void endLoadingOnUiThread(boolean success, boolean isMore, @NonNull List newData) {
+        mQuickAdapter.isUseEmpty(true);
+
         if (success) {
             int newDataSize = newData.size();
 
@@ -238,9 +240,18 @@ public abstract class NewListFragment<T, K extends BaseViewHolder> extends Fragm
     }
 
     public void setEmptyView(View emptyView) {
-        this.emptyView = emptyView;
+        this.setEmptyView(emptyView, false);
+    }
+
+    /**
+     * 请在 enLoading() 之前调用这个方法。
+     *
+     * @param emptyView 空的时候显示的 view;
+     * @param preview   是否在加载直接显示(加载前就显示)
+     */
+    public void setEmptyView(@NonNull View emptyView, boolean preview) {
         mQuickAdapter.setEmptyView(emptyView);
-        mQuickAdapter.setHeaderFooterEmpty(true, false);
+        mQuickAdapter.isUseEmpty(preview);
     }
 
     public void addHeaderView(View header) {
@@ -292,7 +303,7 @@ public abstract class NewListFragment<T, K extends BaseViewHolder> extends Fragm
     }
 
     protected int getPreLoadNumber() {
-        return 5;
+        return 10;
     }
 
     protected RecyclerView getRecyclerView() {
