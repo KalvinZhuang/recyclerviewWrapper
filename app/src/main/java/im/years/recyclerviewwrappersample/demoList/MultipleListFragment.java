@@ -2,10 +2,10 @@ package im.years.recyclerviewwrappersample.demoList;
 
 import android.os.Handler;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
-import com.chad.library.adapter.base.BaseViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,17 +20,20 @@ import im.years.recyclerviewwrappersample.databinding.ItemListLefBinding;
 import im.years.recyclerviewwrappersample.databinding.ItemListRightBinding;
 import im.years.recyclerviewwrappersample.model.MultipleContentMock;
 import im.years.recyclerviewwrappersample.viewHolder.DataBindBaseViewHolder;
+import im.years.recyclerviewwrappersample.viewHolder.DataBindBaseViewHolder2;
 
 public class MultipleListFragment extends NewListFragment<MultipleContentMock, DataBindBaseViewHolder<ItemHelloListBinding>> {
     // 模拟要请求的页面
     private int testRequestPage = 1;
     private int refreshTimes = 1;
-    private SampleListAdapter sampleListAdapter = new SampleListAdapter(null);
+    private SampleListAdapter sampleListAdapter;
 
     @Override
     protected void initViews() {
         super.initViews();
 
+        // 每次初始化的时候，都要在 on create View 内部还原，在 Tab 等内部 当前 fragment 可能没有被销毁数据保留
+        sampleListAdapter = new SampleListAdapter(null);
         this.setAdapter(sampleListAdapter);
 
         // 开启加载
@@ -39,14 +42,10 @@ public class MultipleListFragment extends NewListFragment<MultipleContentMock, D
         setEmptyView(new ListEmptyView(getContext()));
         setListDivider(R.color.list_divider);
         onRefresh();
-
-        // 关闭加载完成
-        setLoadEndGone(true);
     }
 
     @Override
     protected void onRefresh() {
-        testRequestPage = 1;
         super.onRefresh();
         getTestDate(true);
     }
@@ -85,7 +84,7 @@ public class MultipleListFragment extends NewListFragment<MultipleContentMock, D
 
                 endLoading(success, !refresh, contentMockList);
             }
-        }, 1500);
+        }, 1000);
     }
 
     private List<MultipleContentMock> mockDate(int size) {
@@ -139,7 +138,7 @@ public class MultipleListFragment extends NewListFragment<MultipleContentMock, D
         return 2;
     }
 
-    private class SampleListAdapter extends BaseMultiItemQuickAdapter<MultipleContentMock, SampleListAdapter.DateBindViewHolder> {
+    private class SampleListAdapter extends BaseMultiItemQuickAdapter<MultipleContentMock, DataBindBaseViewHolder2<ViewDataBinding>> {
 
         SampleListAdapter(List<MultipleContentMock> data) {
             super(data);
@@ -148,7 +147,7 @@ public class MultipleListFragment extends NewListFragment<MultipleContentMock, D
         }
 
         @Override
-        protected void convert(DateBindViewHolder helper, MultipleContentMock item) {
+        protected void convert(DataBindBaseViewHolder2<ViewDataBinding> helper, MultipleContentMock item) {
             switch (item.getType()) {
                 case MultipleContentMock.left_type: {
                     ItemListLefBinding dataBinding = (ItemListLefBinding) helper.getDataBinding();
@@ -163,19 +162,27 @@ public class MultipleListFragment extends NewListFragment<MultipleContentMock, D
             }
         }
 
+        /*不是内部的 view holder 需要重写（防止泛型擦拭） */
+        @Override
+        protected DataBindBaseViewHolder2<ViewDataBinding> createBaseViewHolder(View view) {
+            return new DataBindBaseViewHolder2<>(view);
+        }
 
-        // view holder 需要在内部定义否则无效 (需要定义并重写 内部的 BaseViewHolder )
-        public class DateBindViewHolder extends BaseViewHolder {
-            private ViewDataBinding dataBind;
-
-            public DateBindViewHolder(View view) {
-                super(view);
-                dataBind = DataBindingUtil.bind(view);
+        /* 重写并 设置 view Bind */
+        @Override
+        protected DataBindBaseViewHolder2<ViewDataBinding> createBaseViewHolder(ViewGroup parent, int layoutResId) {
+            ViewDataBinding viewDataBinding = DataBindingUtil.inflate(mLayoutInflater, layoutResId, parent, false);
+            View rootView;
+            if (viewDataBinding != null) {
+                rootView = viewDataBinding.getRoot();
+            } else {
+                rootView = getItemView(layoutResId, parent);
             }
 
-            public ViewDataBinding getDataBinding() {
-                return dataBind;
-            }
+            DataBindBaseViewHolder2<ViewDataBinding> viewDataBindingDataBindBaseViewHolder = new DataBindBaseViewHolder2<>(rootView);
+            viewDataBindingDataBindBaseViewHolder.setDataBinding(viewDataBinding);
+            return viewDataBindingDataBindBaseViewHolder;
         }
     }
+
 }

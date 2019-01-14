@@ -6,15 +6,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.BaseViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
 import im.years.recyclerviewwrapper.NewListFragment;
 import im.years.recyclerviewwrapper.view.ListEmptyView;
+import im.years.recyclerviewwrappersample.adapter.BaseQuickDataBindingAdapter;
 import im.years.recyclerviewwrappersample.databinding.ItemHelloListBinding;
 import im.years.recyclerviewwrappersample.viewHolder.DataBindBaseViewHolder;
 
@@ -22,13 +20,31 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
     // 模拟要请求的页面
     private int testRequestPage = 1;
     private int refreshTimes = 1;
-    private SampleListAdapter sampleListAdapter = new SampleListAdapter();
+
+    // 不要讲 adapter 放到类中初始化，可能原来的 adapter 可能会被重用
+    //    private SampleListAdapter sampleListAdapter = new SampleListAdapter();
+
+    private SampleListAdapter sampleListAdapter;
+    private BaseQuickDataBindingAdapter<ContentMock, ItemHelloListBinding> baseQuickDataBindingAdapter;
+
 
     @Override
     protected void initViews() {
         super.initViews();
 
-        this.setAdapter(sampleListAdapter);
+        // 方式一：
+        sampleListAdapter = new SampleListAdapter();
+        this.setAdapter(new SampleListAdapter());
+
+//        //方式二：
+//        baseQuickDataBindingAdapter = new BaseQuickDataBindingAdapter<ContentMock, ItemHelloListBinding>(R.layout.item_hello_list) {
+//            @Override
+//            protected void convert(DataBindBaseViewHolder2<ItemHelloListBinding> helper, ContentMock item) {
+//                ItemHelloListBinding dataBinding = helper.getDataBinding();
+//                dataBinding.setItemData(item);
+//            }
+//        };
+//        this.setAdapter(baseQuickDataBindingAdapter);
 
         // 开启加载
         enableRefresh();
@@ -158,8 +174,8 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
 */
 
     /*
-    * 方式二： 通过重写创建方法
-    * */
+     * 方式二： 通过重写创建方法
+     * */
     class SampleListAdapter extends BaseQuickAdapter<ContentMock, DataBindBaseViewHolder<ItemHelloListBinding>> {
         SampleListAdapter() {
             super(R.layout.item_hello_list, null);
@@ -171,16 +187,19 @@ public class NewDataBindListFragment extends NewListFragment<ContentMock, DataBi
             dataBinding.setItemData(item);
         }
 
+        /**
+         * 重写 确保 convert 的泛型类型正确
+         */
         @Override
         protected DataBindBaseViewHolder<ItemHelloListBinding> createBaseViewHolder(ViewGroup parent, int layoutResId) {
             View view = getItemView(layoutResId, parent);
             return new DataBindBaseViewHolder<ItemHelloListBinding>(view);
         }
 
-//        // 一定要重写不然创建的不会是 对应的类型
-//        @Override
-//        protected DataBindBaseViewHolder<ItemHelloListBinding> createBaseViewHolder(View view) {
-//            return new DataBindBaseViewHolder<ItemHelloListBinding>(view);
-//        }
+        //        // 一定要重写不然创建的不会是 对应的类型
+        //        @Override
+        //        protected DataBindBaseViewHolder<ItemHelloListBinding> createBaseViewHolder(View view) {
+        //            return new DataBindBaseViewHolder<ItemHelloListBinding>(view);
+        //        }
     }
 }
